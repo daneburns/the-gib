@@ -1,6 +1,20 @@
 import type { QualityValues } from './types'
 import { QUALITIES, QUALITY_POOL } from './data'
 
+/*
+ * Voice notes — content here channels the author (Jangus / Dane Burns), drawn
+ * from the reference works in docs/reference:
+ *   - THE GIB: noir-bureaucratic, the Office of Unquantifiable Measures.
+ *   - The Ash Communion: short declarative fragments; the pause/aftermath;
+ *     consequence over capability; questions that imply guilt, loss, and
+ *     inevitability; wounds and debts that follow you; mundane specificity
+ *     married to dread. (The dominant key for the lines below.)
+ *   - Goblin Wrestling Federation: the love of the epithet and the theatrical
+ *     moniker — folded into names only, without the bombast.
+ * When adding lines: write fragments, not sentences. Imply a wound, a debt,
+ * or a decision that hasn't finished happening yet. Be specific and weary.
+ */
+
 function pick<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
@@ -10,6 +24,7 @@ const FIRST_NAMES = [
   'Augustus', 'Marlowe', 'Ines', 'Dell', 'Cordelia', 'Sol', 'Verity', 'Ambrose',
   'Halloway', 'Pruitt', 'Constance', 'Reno', 'Sable', 'Magnus', 'Ottilie', 'Bram',
   'Clementine', 'Thaddeus', 'Wren', 'Lazlo', 'Della', 'Crane', 'Iris', 'Mortimer',
+  'Kael', 'Mara', 'Gorman', 'Edran', 'Sten', 'Halric', 'Yara', 'Dov',
 ]
 const LAST_NAMES = [
   'Veil', 'Quist', 'Sarn', 'Halloway', 'Crane', 'Voss', 'Marsh', 'Pell', 'Drury',
@@ -27,6 +42,13 @@ const MONIKERS = [
   'whoever is left',
   'the name on the second form',
   'somebody else’s emergency contact',
+  'the one the others desert to',
+  'Mister Past-Tense',
+  'the question nobody wanted answered',
+  'Kael, if that’s still the name',
+  'the name said first when decisions need making',
+  'the soldier’s kid, and it shows',
+  'Last-One-Standing, and not proud of it',
 ]
 
 export function genDesignation(): string {
@@ -51,6 +73,16 @@ const BEARINGS = [
   'Takes up less room than they should.',
   'Already halfway down the stairs.',
   'Has the posture of a closed door.',
+  'Looks like someone who stopped counting.',
+  'The stillness of a person waiting for a sound they’ve heard before.',
+  'Has the face of someone who has started fires in worse places than this.',
+  'Sits closest to the door without seeming to choose it.',
+  'Learned, somewhere, to be quiet after lights out.',
+  'Holds a thing they aren’t using.',
+  'The kind of still that means a decision already happened.',
+  'Looks at you the way you look at someone before asking what you don’t want answered.',
+  'Carries the room’s silence in with them.',
+  'A defeated movement to one shoulder. The kind that means what can you do.',
 ]
 
 // ---- Origin / Provenance ----
@@ -69,6 +101,16 @@ const ORIGINS = [
   'Worked an honest job once, briefly, and it’s a sore subject.',
   'No fixed origin. The Office finds this itself diagnostic.',
   'Came back from a place you’re not supposed to come back from.',
+  'Lost someone once. Past tense, and not discussed.',
+  'Father was a soldier. Hated.',
+  'Stopped counting the years after the fourth one.',
+  'Owes a debt to a name the paperwork won’t print.',
+  'There was a person they were supposed to protect. There isn’t now.',
+  'Left a city that learned to be quiet about certain rooms.',
+  'Buried something in the woods, thinking distance would fix it. It didn’t.',
+  'Doesn’t trust healers. Won’t say why.',
+  'Whatever was said back then has been following ever since.',
+  'Thought the woods would fix it. The woods are not in that business.',
 ]
 
 // ---- One thing this person wants ----
@@ -86,6 +128,15 @@ const WANTS = [
   'Their name, cleared, in front of the people who said it wrong.',
   'One quiet day where nothing is owed.',
   'To be the one setting the terms, for a change.',
+  'To not become the thing they promised they wouldn’t.',
+  'One apology delivered before it stops mattering.',
+  'To protect one person all the way through, this time.',
+  'To stop performing and just answer the question.',
+  'To fail someone better than they failed the last one.',
+  'To hear their own name said the way it used to be said.',
+  'To owe no one by morning.',
+  'To learn the one true thing and survive knowing it.',
+  'To be remembered as the version they meant to be.',
 ]
 
 // ---- One thing this person fears ----
@@ -103,6 +154,15 @@ const FEARS = [
   'Stairs. The going-down kind.',
   'That there was never a seventh quality, and they are it.',
   'Being the only one left to decide.',
+  'The question asked gently, by someone who already knows.',
+  'That “supposed to protect” has a past tense, and it’s the answer.',
+  'Being the one the others desert to when it counts.',
+  'That what was said by the fire will follow them.',
+  'The silence that gets treated as an answer.',
+  'That the woods were never going to fix it.',
+  'The version of them everyone already believes.',
+  'Being handed a weapon they volunteered.',
+  'That distance fixes nothing, and they spent years proving it.',
 ]
 
 // ---- Carried & Kept (inventory · notes) ----
@@ -119,6 +179,14 @@ const INVENTORY = [
   'A form, half-filled, that they refuse to finish.',
   'A debt marker signed in a hand they don’t recognize.',
   'A second watch, stopped at a meaningful hour.',
+  'A bottle that had the good sense of being available.',
+  'Matches, and the habit of starting fires in bad places.',
+  'A small bell they will not ring.',
+  'A child’s thing, kept long past the point of letting go.',
+  'Something that glows, that nobody has looked into.',
+  'A flask, half full; there are other questions if anyone wants to answer them.',
+  'A letter, never sent, soft at the folds.',
+  'A scar they describe as an accident.',
 ]
 
 export function randomQualities(): QualityValues {
