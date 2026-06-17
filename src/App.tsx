@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Character } from './types'
 import { loadAll, newCharacter, remove, upsert } from './storage'
+import { generatePerson } from './generator'
 import Roster from './components/Roster'
 import Creator from './components/Creator'
 import PersonRecord from './components/PersonRecord'
@@ -36,6 +37,10 @@ export default function App() {
     setCharacters(upsert(c))
   }
 
+  function conjuredDraft(): Character {
+    return { ...newCharacter(), ...generatePerson() }
+  }
+
   if (view.name === 'create') {
     return (
       <Shell>
@@ -57,6 +62,7 @@ export default function App() {
             characters={characters}
             onOpen={(id) => setView({ name: 'view', id })}
             onNew={() => setView({ name: 'create', draft: newCharacter() })}
+            onConjure={() => setView({ name: 'create', draft: conjuredDraft() })}
             onDelete={handleDelete}
           />
         </Shell>
@@ -80,6 +86,7 @@ export default function App() {
         characters={characters}
         onOpen={(id) => setView({ name: 'view', id })}
         onNew={() => setView({ name: 'create', draft: newCharacter() })}
+        onConjure={() => setView({ name: 'create', draft: conjuredDraft() })}
         onDelete={handleDelete}
       />
     </Shell>

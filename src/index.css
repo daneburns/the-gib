@@ -168,6 +168,24 @@ button {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.dice-btn {
+  background: none;
+  border: 1px solid var(--field-line);
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+.dice-btn:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--gold);
 }
 .field-input {
   font-family: var(--serif);
@@ -298,8 +316,35 @@ button {
   color: var(--ink-soft);
   margin: 0 0 18px;
 }
-.new-btn {
+.roster-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
   margin-top: 4px;
+}
+
+/* Conjure (generate) controls in the creator masthead */
+.masthead-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+}
+.conjure-btn {
+  border-color: var(--gold);
+}
+.conjure-btn:hover {
+  background: var(--gold);
+  color: var(--ink);
+}
+.conjure-note {
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-soft);
+  max-width: 360px;
 }
 .roster-empty {
   text-align: center;

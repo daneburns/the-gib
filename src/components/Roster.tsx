@@ -6,6 +6,7 @@ interface Props {
   characters: Character[]
   onOpen: (id: string) => void
   onNew: () => void
+  onConjure: () => void
   onDelete: (id: string) => void
 }
 
@@ -19,7 +20,7 @@ function topQuality(c: Character) {
   return best
 }
 
-export default function Roster({ characters, onOpen, onNew, onDelete }: Props) {
+export default function Roster({ characters, onOpen, onNew, onConjure, onDelete }: Props) {
   return (
     <div className="roster">
       <header className="roster-head">
@@ -31,9 +32,14 @@ export default function Roster({ characters, onOpen, onNew, onDelete }: Props) {
         <p className="roster-subtitle">
           Field Manual for Persons of Indeterminate Quality — Records Room
         </p>
-        <button type="button" className="primary-btn new-btn" onClick={onNew}>
-          + New Person Record
-        </button>
+        <div className="roster-actions">
+          <button type="button" className="primary-btn new-btn" onClick={onNew}>
+            + New Person Record
+          </button>
+          <button type="button" className="ghost-btn" onClick={onConjure}>
+            ⚄ Conjure a stranger
+          </button>
+        </div>
       </header>
 
       {characters.length === 0 ? (

@@ -2,6 +2,15 @@ import { useState } from 'react'
 import type { Bond, Character } from '../types'
 import { QUALITIES } from '../data'
 import { uid } from '../storage'
+import {
+  generatePerson,
+  genDesignation,
+  genBearing,
+  genOrigin,
+  genWants,
+  genFears,
+  genInventory,
+} from '../generator'
 import QualityAllocator, { formatMod } from './QualityAllocator'
 
 interface Props {
@@ -24,6 +33,20 @@ export default function Creator({ initial, onSave, onCancel }: Props) {
 
   function set<K extends keyof Character>(key: K, value: Character[K]) {
     setDraft((d) => ({ ...d, [key]: value }))
+  }
+
+  function generateAll() {
+    const g = generatePerson()
+    setDraft((d) => ({
+      ...d,
+      designation: g.designation,
+      bearing: g.bearing,
+      origin: g.origin,
+      wants: g.wants,
+      fears: g.fears,
+      inventory: g.inventory,
+      qualities: g.qualities,
+    }))
   }
 
   const qualitiesComplete = QUALITIES.every((q) => draft.qualities[q.key] !== null)
@@ -59,6 +82,15 @@ export default function Creator({ initial, onSave, onCancel }: Props) {
         <p className="sheet-subtitle">
           of Indeterminate Quality — distribute the difference and find out what happens
         </p>
+        <div className="masthead-actions">
+          <button type="button" className="ghost-btn conjure-btn" onClick={generateAll}>
+            ⚄ Conjure a Person
+          </button>
+          <span className="conjure-note">
+            Rolls a whole stranger — name, bearing, drives, and quantities. Reroll any
+            field with its die.
+          </span>
+        </div>
       </header>
 
       <ol className="stepper" aria-label="Progress">
@@ -90,6 +122,7 @@ export default function Creator({ initial, onSave, onCancel }: Props) {
                 label="Designation — the name they answer to"
                 value={draft.designation}
                 onChange={(v) => set('designation', v)}
+                onGenerate={() => set('designation', genDesignation())}
                 autoFocus
               />
               <Field
@@ -101,12 +134,14 @@ export default function Creator({ initial, onSave, onCancel }: Props) {
                 label="Bearing — how the room reads them at a glance"
                 value={draft.bearing}
                 onChange={(v) => set('bearing', v)}
+                onGenerate={() => set('bearing', genBearing())}
                 wide
               />
               <Field
                 label="Origin / Provenance"
                 value={draft.origin}
                 onChange={(v) => set('origin', v)}
+                onGenerate={() => set('origin', genOrigin())}
                 wide
               />
             </div>
@@ -129,12 +164,14 @@ export default function Creator({ initial, onSave, onCancel }: Props) {
                 label="One thing this person wants"
                 value={draft.wants}
                 onChange={(v) => set('wants', v)}
+                onGenerate={() => set('wants', genWants())}
                 wide
               />
               <Field
                 label="One thing this person fears"
                 value={draft.fears}
                 onChange={(v) => set('fears', v)}
+                onGenerate={() => set('fears', genFears())}
                 wide
               />
             </div>
@@ -182,7 +219,10 @@ export default function Creator({ initial, onSave, onCancel }: Props) {
           {step === 5 && (
             <div className="field-grid">
               <label className="field wide">
-                <span className="field-label">Carried &amp; Kept — inventory · notes</span>
+                <span className="field-label">
+                  <span>Carried &amp; Kept — inventory · notes</span>
+                  <DiceButton onClick={() => set('inventory', genInventory())} />
+                </span>
                 <textarea
                   className="field-input field-textarea"
                   rows={4}
@@ -277,12 +317,16 @@ interface FieldProps {
   onChange: (v: string) => void
   wide?: boolean
   autoFocus?: boolean
+  onGenerate?: () => void
 }
 
-function Field({ label, value, onChange, wide, autoFocus }: FieldProps) {
+function Field({ label, value, onChange, wide, autoFocus, onGenerate }: FieldProps) {
   return (
     <label className={`field${wide ? ' wide' : ''}`}>
-      <span className="field-label">{label}</span>
+      <span className="field-label">
+        <span>{label}</span>
+        {onGenerate && <DiceButton onClick={onGenerate} />}
+      </span>
       <input
         className="field-input"
         value={value}
@@ -290,5 +334,22 @@ function Field({ label, value, onChange, wide, autoFocus }: FieldProps) {
         onChange={(e) => onChange(e.target.value)}
       />
     </label>
+  )
+}
+
+export function DiceButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className="dice-btn"
+      onClick={(e) => {
+        e.preventDefault()
+        onClick()
+      }}
+      aria-label="Roll this field"
+      title="Roll this one"
+    >
+      ⚄
+    </button>
   )
 }
