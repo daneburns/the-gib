@@ -105,6 +105,15 @@ export default function Roster({
                   onClick={() => onOpen(c.id)}
                 >
                   <div className="dossier-tab">GIB-2</div>
+                  <div className={`dossier-thumb${c.portrait ? '' : ' is-empty'}`}>
+                    {c.portrait ? (
+                      <img src={c.portrait} alt="" />
+                    ) : (
+                      <span className="dossier-thumb-mark" aria-hidden="true">
+                        ◻
+                      </span>
+                    )}
+                  </div>
                   <div className="dossier-body">
                     <span className="dossier-name">
                       {c.designation || 'Unnamed Person'}
