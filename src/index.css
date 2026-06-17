@@ -816,6 +816,14 @@ button {
   margin: 0;
   min-height: 24px;
 }
+.record-inventory-input {
+  margin-top: 6px;
+}
+
+/* Shown only when printing (screen uses the editable controls instead) */
+.print-only {
+  display: none;
+}
 
 /* ---------- At-table reference ---------- */
 .reference-head {
@@ -1048,6 +1056,9 @@ button {
   }
   .no-print {
     display: none !important;
+  }
+  .print-only {
+    display: revert;
   }
   .app {
     padding: 0;

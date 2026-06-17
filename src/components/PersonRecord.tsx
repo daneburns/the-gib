@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Character, StateEntry } from '../types'
+import type { Bond, Character, StateEntry } from '../types'
 import { QUALITIES, QUALITY_BY_KEY, STATE_MENAGERIE, TABLE_MOVES } from '../data'
 import { uid } from '../storage'
 import { dieFace, rollMove, type Roll } from '../dice'
@@ -34,6 +34,16 @@ export default function PersonRecord({ character, onChange, onEdit, onBack }: Pr
 
   function markExperience() {
     patch({ experience: Math.min(5, c.experience + 1) })
+  }
+
+  function addBond() {
+    patch({ bonds: [...c.bonds, { id: uid(), who: '', how: '' }] })
+  }
+  function updateBond(id: string, p: Partial<Bond>) {
+    patch({ bonds: c.bonds.map((b) => (b.id === id ? { ...b, ...p } : b)) })
+  }
+  function removeBond(id: string) {
+    patch({ bonds: c.bonds.filter((b) => b.id !== id) })
   }
 
   function addState(description: string, interferes = '') {
@@ -255,7 +265,8 @@ export default function PersonRecord({ character, onChange, onEdit, onBack }: Pr
           <div className="record-bonds">
             <span className="field-label">Bonds — how you know the others at the table</span>
             {c.bonds.length === 0 && <p className="empty-note">No bonds recorded.</p>}
-            <ul className="bond-list">
+            {/* Print-friendly read-only view */}
+            <ul className="bond-list print-only">
               {c.bonds.map((b) => (
                 <li key={b.id}>
                   {b.who ? <strong>{b.who}</strong> : <em>someone</em>}
@@ -264,12 +275,49 @@ export default function PersonRecord({ character, onChange, onEdit, onBack }: Pr
                 </li>
               ))}
             </ul>
+            {/* Editable view */}
+            <div className="no-print">
+              {c.bonds.map((b) => (
+                <div className="bond-row" key={b.id}>
+                  <input
+                    className="field-input bond-who"
+                    placeholder="With…"
+                    value={b.who}
+                    onChange={(e) => updateBond(b.id, { who: e.target.value })}
+                  />
+                  <input
+                    className="field-input bond-how"
+                    placeholder="…is how you know each other"
+                    value={b.how}
+                    onChange={(e) => updateBond(b.id, { how: e.target.value })}
+                  />
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    aria-label="Remove bond"
+                    onClick={() => removeBond(b.id)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button type="button" className="ghost-btn" onClick={addBond}>
+                + Add a bond
+              </button>
+            </div>
           </div>
         </Section>
 
         {/* §6 Carried & Kept */}
         <Section n="6" title="Carried & Kept" sub="Inventory · Notes">
-          <p className="record-inventory">{c.inventory || <em>Nothing recorded.</em>}</p>
+          <p className="record-inventory print-only">{c.inventory || <em>Nothing recorded.</em>}</p>
+          <textarea
+            className="field-input field-textarea record-inventory-input no-print"
+            rows={4}
+            placeholder="Nothing recorded — a coat, a key, forty-one cents and a grudge…"
+            value={c.inventory}
+            onChange={(e) => patch({ inventory: e.target.value })}
+          />
         </Section>
       </article>
 
