@@ -1069,3 +1069,90 @@ button {
     page-break-after: always;
   }
 }
+
+/* ---------- Visually-hidden (file input trigger) ---------- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- "FILED" stamp animation ---------- */
+.filed-stamp {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 50;
+}
+.filed-stamp-ink {
+  border: 6px double var(--stamp);
+  border-radius: 6px;
+  color: var(--stamp);
+  padding: 12px 42px;
+  text-align: center;
+  background: rgba(138, 43, 31, 0.06);
+  box-shadow: inset 0 0 0 2px rgba(138, 43, 31, 0.18);
+  opacity: 0;
+  transform: rotate(-11deg);
+  animation: filed-slam 1.9s ease forwards;
+}
+.filed-stamp-word {
+  display: block;
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 64px;
+  letter-spacing: 0.18em;
+  text-indent: 0.18em;
+  line-height: 1;
+}
+.filed-stamp-sub {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  margin-top: 6px;
+}
+@keyframes filed-slam {
+  0% {
+    opacity: 0;
+    transform: rotate(-11deg) scale(2.4);
+  }
+  14% {
+    opacity: 0.92;
+    transform: rotate(-11deg) scale(1);
+  }
+  20% {
+    transform: rotate(-11deg) scale(1.05);
+  }
+  26% {
+    transform: rotate(-11deg) scale(1);
+  }
+  72% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-11deg) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .filed-stamp-ink {
+    animation-duration: 1.2s;
+    animation-name: filed-fade;
+  }
+  @keyframes filed-fade {
+    0% { opacity: 0; }
+    20% { opacity: 0.92; }
+    80% { opacity: 0.92; }
+    100% { opacity: 0; }
+  }
+}

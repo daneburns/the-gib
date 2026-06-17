@@ -1,5 +1,7 @@
+import { useRef } from 'react'
 import type { Character } from '../types'
 import { QUALITIES } from '../data'
+import { exportAll, parseImport } from '../io'
 import { formatMod } from './QualityAllocator'
 
 interface Props {
@@ -7,6 +9,7 @@ interface Props {
   onOpen: (id: string) => void
   onNew: () => void
   onConjure: () => void
+  onImport: (incoming: Character[]) => void
   onDelete: (id: string) => void
 }
 
@@ -20,7 +23,32 @@ function topQuality(c: Character) {
   return best
 }
 
-export default function Roster({ characters, onOpen, onNew, onConjure, onDelete }: Props) {
+export default function Roster({
+  characters,
+  onOpen,
+  onNew,
+  onConjure,
+  onImport,
+  onDelete,
+}: Props) {
+  const fileInput = useRef<HTMLInputElement>(null)
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = '' // allow re-importing the same file
+    if (!file) return
+    try {
+      const incoming = parseImport(await file.text())
+      if (incoming.length === 0) {
+        alert('No valid Person Records found in that file.')
+        return
+      }
+      onImport(incoming)
+    } catch {
+      alert('That file could not be read as a GIB record (invalid JSON).')
+    }
+  }
+
   return (
     <div className="roster">
       <header className="roster-head">
@@ -39,6 +67,21 @@ export default function Roster({ characters, onOpen, onNew, onConjure, onDelete 
           <button type="button" className="ghost-btn" onClick={onConjure}>
             ⚄ Conjure a stranger
           </button>
+          <button type="button" className="ghost-btn" onClick={() => fileInput.current?.click()}>
+            Import
+          </button>
+          {characters.length > 0 && (
+            <button type="button" className="ghost-btn" onClick={() => exportAll(characters)}>
+              Export all
+            </button>
+          )}
+          <input
+            ref={fileInput}
+            type="file"
+            accept="application/json,.json"
+            className="visually-hidden"
+            onChange={handleFile}
+          />
         </div>
       </header>
 

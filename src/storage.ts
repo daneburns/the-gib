@@ -71,3 +71,21 @@ export function remove(id: string): Character[] {
   saveAll(list)
   return list
 }
+
+/** Merge imported characters in, reassigning ids that would collide. */
+export function importCharacters(incoming: Character[]): {
+  list: Character[]
+  added: number
+} {
+  const list = loadAll()
+  const ids = new Set(list.map((c) => c.id))
+  let added = 0
+  for (const c of incoming) {
+    const char = ids.has(c.id) ? { ...c, id: uid() } : c
+    ids.add(char.id)
+    list.unshift(char)
+    added++
+  }
+  saveAll(list)
+  return { list, added }
+}

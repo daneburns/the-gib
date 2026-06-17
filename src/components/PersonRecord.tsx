@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Bond, Character, StateEntry } from '../types'
 import { QUALITIES, QUALITY_BY_KEY, STATE_MENAGERIE, TABLE_MOVES } from '../data'
 import { uid } from '../storage'
 import { dieFace, rollMove, type Roll } from '../dice'
+import { exportCharacter } from '../io'
+import { genBearing, genDesignation, genFears, genOrigin, genWants } from '../generator'
+import { DiceButton } from './Creator'
 import { formatMod } from './QualityAllocator'
 
 function signed(n: number): string {
@@ -12,17 +15,24 @@ function signed(n: number): string {
 interface Props {
   character: Character
   onChange: (c: Character) => void
-  onEdit: () => void
+  justFiled: boolean
   onBack: () => void
 }
 
 const MAX_STATES = 4 // a fifth is the turning point — Out
 
-export default function PersonRecord({ character, onChange, onEdit, onBack }: Props) {
+export default function PersonRecord({ character, onChange, justFiled, onBack }: Props) {
   const c = character
   const [newState, setNewState] = useState('')
   const [roll, setRoll] = useState<Roll | null>(null)
   const [adjust, setAdjust] = useState(0)
+  const [showStamp, setShowStamp] = useState(justFiled)
+
+  useEffect(() => {
+    if (!showStamp) return
+    const t = setTimeout(() => setShowStamp(false), 1900)
+    return () => clearTimeout(t)
+  }, [showStamp])
 
   function patch(p: Partial<Character>) {
     onChange({ ...c, ...p })
@@ -75,16 +85,25 @@ export default function PersonRecord({ character, onChange, onEdit, onBack }: Pr
 
   return (
     <div className="record">
+      {showStamp && (
+        <div className="filed-stamp" aria-hidden="true">
+          <div className="filed-stamp-ink">
+            <span className="filed-stamp-word">FILED</span>
+            <span className="filed-stamp-sub">GIB-2 · REV. 7 · OFFICE OF UNQUANTIFIABLE MEASURES</span>
+          </div>
+        </div>
+      )}
+
       <div className="record-toolbar no-print">
         <button type="button" className="ghost-btn" onClick={onBack}>
           ← Roster
         </button>
         <div className="record-toolbar-right">
+          <button type="button" className="ghost-btn" onClick={() => exportCharacter(c)}>
+            Export
+          </button>
           <button type="button" className="ghost-btn" onClick={() => window.print()}>
             Print
-          </button>
-          <button type="button" className="primary-btn" onClick={onEdit}>
-            Edit
           </button>
         </div>
       </div>
@@ -105,10 +124,29 @@ export default function PersonRecord({ character, onChange, onEdit, onBack }: Pr
         {/* §1 Identification */}
         <Section n="1" title="Identification" sub="Particulars">
           <div className="record-id">
-            <IdField label="Designation — the name they answer to" value={c.designation} />
-            <IdField label="Borne by — player" value={c.borneBy} />
-            <IdField label="Bearing — how the room reads them" value={c.bearing} />
-            <IdField label="Origin / Provenance" value={c.origin} />
+            <EditField
+              label="Designation — the name they answer to"
+              value={c.designation}
+              onChange={(v) => patch({ designation: v })}
+              onGenerate={() => patch({ designation: genDesignation() })}
+            />
+            <EditField
+              label="Borne by — player"
+              value={c.borneBy}
+              onChange={(v) => patch({ borneBy: v })}
+            />
+            <EditField
+              label="Bearing — how the room reads them"
+              value={c.bearing}
+              onChange={(v) => patch({ bearing: v })}
+              onGenerate={() => patch({ bearing: genBearing() })}
+            />
+            <EditField
+              label="Origin / Provenance"
+              value={c.origin}
+              onChange={(v) => patch({ origin: v })}
+              onGenerate={() => patch({ origin: genOrigin() })}
+            />
           </div>
         </Section>
 
@@ -259,8 +297,18 @@ export default function PersonRecord({ character, onChange, onEdit, onBack }: Pr
         {/* §5 Drives & Bonds */}
         <Section n="5" title="Drives & Bonds" sub="First Sitting">
           <div className="record-drives">
-            <IdField label="One thing this person wants" value={c.wants} />
-            <IdField label="One thing this person fears" value={c.fears} />
+            <EditField
+              label="One thing this person wants"
+              value={c.wants}
+              onChange={(v) => patch({ wants: v })}
+              onGenerate={() => patch({ wants: genWants() })}
+            />
+            <EditField
+              label="One thing this person fears"
+              value={c.fears}
+              onChange={(v) => patch({ fears: v })}
+              onGenerate={() => patch({ fears: genFears() })}
+            />
           </div>
           <div className="record-bonds">
             <span className="field-label">Bonds — how you know the others at the table</span>
@@ -509,11 +557,27 @@ function DiceConsole({ roll, adjust, setAdjust, onMarkExperience, canMark }: Dic
   )
 }
 
-function IdField({ label, value }: { label: string; value: string }) {
+interface EditFieldProps {
+  label: string
+  value: string
+  onChange: (v: string) => void
+  onGenerate?: () => void
+}
+
+function EditField({ label, value, onChange, onGenerate }: EditFieldProps) {
   return (
-    <div className="id-field">
-      <span className="field-label">{label}</span>
-      <span className="id-value">{value || ' '}</span>
-    </div>
+    <label className="id-field">
+      <span className="field-label">
+        <span>{label}</span>
+        {onGenerate && <DiceButton onClick={onGenerate} />}
+      </span>
+      {/* Read-only value for print; editable input on screen */}
+      <span className="id-value print-only">{value || " "}</span>
+      <input
+        className="field-input no-print"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </label>
   )
 }
