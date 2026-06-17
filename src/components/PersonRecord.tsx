@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import type { Character, StateEntry } from '../types'
-import { QUALITIES, STATE_MENAGERIE, TABLE_MOVES } from '../data'
+import { QUALITIES, QUALITY_BY_KEY, STATE_MENAGERIE, TABLE_MOVES } from '../data'
 import { uid } from '../storage'
+import { dieFace, rollMove, type Roll } from '../dice'
 import { formatMod } from './QualityAllocator'
+
+function signed(n: number): string {
+  return n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : '+0'
+}
 
 interface Props {
   character: Character
@@ -16,9 +21,19 @@ const MAX_STATES = 4 // a fifth is the turning point — Out
 export default function PersonRecord({ character, onChange, onEdit, onBack }: Props) {
   const c = character
   const [newState, setNewState] = useState('')
+  const [roll, setRoll] = useState<Roll | null>(null)
+  const [adjust, setAdjust] = useState(0)
 
   function patch(p: Partial<Character>) {
     onChange({ ...c, ...p })
+  }
+
+  function doRoll(key: string, move: string, qualityName: string, modifier: number) {
+    setRoll(rollMove({ modifier, adjust, moveKey: key, moveName: move, qualityName }))
+  }
+
+  function markExperience() {
+    patch({ experience: Math.min(5, c.experience + 1) })
   }
 
   function addState(description: string, interferes = '') {
@@ -264,23 +279,45 @@ export default function PersonRecord({ character, onChange, onEdit, onBack }: Pr
           <h2 className="sheet-title">At-Table Reference</h2>
           <p className="sheet-subtitle">Roll 2d6 + the relevant Quality. Keep this side up while playing.</p>
         </header>
+
+        <DiceConsole
+          roll={roll}
+          adjust={adjust}
+          setAdjust={setAdjust}
+          onMarkExperience={markExperience}
+          canMark={c.experience < 5}
+        />
+
         <div className="reference-grid">
-          {QUALITIES.map((q) => (
-            <div className="reference-move" key={q.key}>
-              <div className="reference-move-head">
-                <span className="reference-move-name">
-                  {q.move} — {q.name}
-                </span>
-                <span className="reference-move-val">{formatMod(c.qualities[q.key])}</span>
+          {QUALITIES.map((q) => {
+            const mod = c.qualities[q.key] ?? 0
+            const hit = roll?.moveKey === q.key ? roll.band : null
+            return (
+              <div className="reference-move" key={q.key}>
+                <div className="reference-move-head">
+                  <span className="reference-move-name">
+                    {q.move} — {q.name}
+                  </span>
+                  <span className="reference-move-roll">
+                    <span className="reference-move-val">{formatMod(c.qualities[q.key])}</span>
+                    <button
+                      type="button"
+                      className="roll-btn no-print"
+                      onClick={() => doRoll(q.key, `${q.move} — ${q.name}`, q.name, mod)}
+                    >
+                      ⚄ Roll
+                    </button>
+                  </span>
+                </div>
+                <p className="reference-trigger">{q.trigger}</p>
+                <ul className="reference-results">
+                  <li className={hit === '10+' ? 'is-hit' : ''}><b>10+</b> {q.results.strong}</li>
+                  <li className={hit === '7–9' ? 'is-hit' : ''}><b>7–9</b> {q.results.weak}</li>
+                  <li className={hit === '6−' ? 'is-hit' : ''}><b>6−</b> {q.results.miss}</li>
+                </ul>
               </div>
-              <p className="reference-trigger">{q.trigger}</p>
-              <ul className="reference-results">
-                <li><b>10+</b> {q.results.strong}</li>
-                <li><b>7–9</b> {q.results.weak}</li>
-                <li><b>6−</b> {q.results.miss}</li>
-              </ul>
-            </div>
-          ))}
+            )
+          })}
           {TABLE_MOVES.map((m) => (
             <div className="reference-move" key={m.name}>
               <div className="reference-move-head">
@@ -327,6 +364,100 @@ function Section({
       </div>
       <div className="section-body">{children}</div>
     </section>
+  )
+}
+
+const ADJUST_CHIPS = [
+  { label: '−1 State', delta: -1 },
+  { label: '+1 forward', delta: 1 },
+  { label: '+2 help', delta: 2 },
+  { label: '−2 hinder', delta: -2 },
+]
+
+function resultText(moveKey: string, band: Roll['band']): string {
+  const q = QUALITY_BY_KEY[moveKey as keyof typeof QUALITY_BY_KEY]
+  if (!q) return ''
+  if (band === '10+') return q.results.strong
+  if (band === '7–9') return q.results.weak
+  return q.results.miss
+}
+
+interface DiceConsoleProps {
+  roll: Roll | null
+  adjust: number
+  setAdjust: (fn: (a: number) => number) => void
+  onMarkExperience: () => void
+  canMark: boolean
+}
+
+function DiceConsole({ roll, adjust, setAdjust, onMarkExperience, canMark }: DiceConsoleProps) {
+  return (
+    <div className="dice-console no-print">
+      <div className="dice-adjust">
+        <span className="field-label">Situational modifier</span>
+        <div className="dice-stepper">
+          <button type="button" className="ghost-btn" onClick={() => setAdjust((a) => a - 1)}>
+            −
+          </button>
+          <span className="dice-adjust-val">{signed(adjust)}</span>
+          <button type="button" className="ghost-btn" onClick={() => setAdjust((a) => a + 1)}>
+            +
+          </button>
+        </div>
+        <div className="dice-chips">
+          {ADJUST_CHIPS.map((ch) => (
+            <button
+              key={ch.label}
+              type="button"
+              className="chip"
+              onClick={() => setAdjust((a) => a + ch.delta)}
+            >
+              {ch.label}
+            </button>
+          ))}
+          <button type="button" className="chip" onClick={() => setAdjust(() => 0)}>
+            reset
+          </button>
+        </div>
+      </div>
+
+      {roll ? (
+        <div className="dice-result" key={roll.id} data-band={roll.band}>
+          <div className="dice-faces">
+            <span className="die">{dieFace(roll.d1)}</span>
+            <span className="die">{dieFace(roll.d2)}</span>
+          </div>
+          <div className="dice-readout">
+            <div className="dice-math">
+              <span className="dice-move">{roll.moveName}</span>
+              <span className="dice-equation">
+                {roll.d1} + {roll.d2}
+                {roll.modifier !== 0 && ` ${signed(roll.modifier)} (${roll.qualityName})`}
+                {roll.adjust !== 0 && ` ${signed(roll.adjust)}`} ={' '}
+                <strong className="dice-total">{roll.total}</strong>
+                <span className="dice-band">{roll.band}</span>
+              </span>
+            </div>
+            <p className="dice-outcome">{resultText(roll.moveKey, roll.band)}</p>
+            {roll.band === '6−' && (
+              <button
+                type="button"
+                className="ghost-btn dice-xp"
+                onClick={onMarkExperience}
+                disabled={!canMark}
+              >
+                {canMark ? '+ Mark experience' : 'Experience full — take an Advance'}
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <p className="dice-idle">
+          Choose a move below and roll. 2d6 + the relevant Quality. The dice are
+          rationed; spend them at the worst possible moments.
+        </p>
+      )}
+    </div>
   )
 }
 

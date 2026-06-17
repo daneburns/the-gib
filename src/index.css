@@ -824,6 +824,148 @@ button {
   padding-bottom: 12px;
   margin-bottom: 16px;
 }
+
+/* ---------- Dice console ---------- */
+.dice-console {
+  border: 1.5px solid var(--rule);
+  background: var(--paper-2);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.dice-adjust {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+.dice-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dice-stepper .ghost-btn {
+  padding: 4px 12px;
+  font-size: 15px;
+}
+.dice-adjust-val {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 600;
+  min-width: 34px;
+  text-align: center;
+}
+.dice-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dice-idle {
+  font-style: italic;
+  color: var(--ink-soft);
+  margin: 12px 0 0;
+}
+.dice-result {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--field-line);
+  animation: roll-flash 0.45s ease;
+}
+@keyframes roll-flash {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.dice-faces {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.die {
+  font-size: 46px;
+  line-height: 1;
+  color: var(--ink);
+}
+.dice-readout {
+  flex: 1;
+}
+.dice-move {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+.dice-equation {
+  font-family: var(--mono);
+  font-size: 14px;
+}
+.dice-total {
+  font-size: 20px;
+  margin: 0 2px 0 4px;
+}
+.dice-band {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  margin-left: 8px;
+  border: 1.5px solid var(--ink);
+  vertical-align: middle;
+}
+.dice-result[data-band='10+'] .dice-band {
+  background: var(--ink);
+  color: var(--paper-2);
+}
+.dice-result[data-band='6−'] .dice-band {
+  background: var(--stamp);
+  border-color: var(--stamp);
+  color: var(--paper-2);
+}
+.dice-outcome {
+  margin: 6px 0 0;
+  font-style: italic;
+}
+.dice-xp {
+  margin-top: 10px;
+  padding: 6px 12px;
+}
+.roll-btn {
+  background: var(--ink);
+  color: var(--paper-2);
+  border: 1.5px solid var(--ink);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  margin-left: 8px;
+}
+.roll-btn:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+.reference-move-roll {
+  display: inline-flex;
+  align-items: center;
+}
+.reference-results li.is-hit {
+  background: rgba(176, 141, 46, 0.22);
+  box-shadow: -6px 0 0 var(--gold);
+  padding-left: 4px;
+}
 .reference-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
