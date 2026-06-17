@@ -68,6 +68,7 @@ function coerceCharacter(raw: unknown): Character | null {
     borneBy: str(r.borneBy),
     bearing: str(r.bearing),
     origin: str(r.origin),
+    portrait: str(r.portrait),
     qualities,
     wants: str(r.wants),
     fears: str(r.fears),

@@ -30,6 +30,7 @@ export interface Character {
   borneBy: string // player
   bearing: string // how the room reads them at a glance
   origin: string // origin / provenance
+  portrait: string // a likeness, stored as a (downscaled) data URL — '' if none
   // §2 The Six Qualities
   qualities: QualityValues
   // §5 Drives & Bonds

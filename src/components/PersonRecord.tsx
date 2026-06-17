@@ -7,6 +7,7 @@ import { exportCharacter } from '../io'
 import { genBearing, genDesignation, genFears, genOrigin, genWants } from '../generator'
 import { DiceButton } from './Creator'
 import { formatMod } from './QualityAllocator'
+import Portrait from './Portrait'
 
 function signed(n: number): string {
   return n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : '+0'
@@ -123,7 +124,14 @@ export default function PersonRecord({ character, onChange, justFiled, onBack }:
 
         {/* §1 Identification */}
         <Section n="1" title="Identification" sub="Particulars">
-          <div className="record-id">
+          <div className="record-id record-id-portrait">
+            <div className="record-portrait-cell">
+              <span className="field-label">Likeness</span>
+              <Portrait
+                value={c.portrait}
+                onChange={(v) => patch({ portrait: v })}
+              />
+            </div>
             <EditField
               label="Designation — the name they answer to"
               value={c.designation}

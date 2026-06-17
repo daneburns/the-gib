@@ -1026,8 +1026,85 @@ button {
   color: var(--ink-soft);
 }
 
+/* ---------- Portrait / Likeness ---------- */
+.portrait {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.portrait-frame {
+  border: 1.5px solid var(--rule);
+  background: var(--paper-2);
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  max-width: 220px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1px var(--paper), 2px 3px 0 var(--rule);
+}
+.portrait-frame.has-likeness {
+  background: var(--ink);
+}
+.portrait-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(0.18) contrast(1.02);
+}
+.portrait-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px;
+  text-align: center;
+}
+.portrait-empty-mark {
+  font-size: 30px;
+  color: var(--field-line);
+  line-height: 1;
+}
+.portrait-empty-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.portrait-actions {
+  display: flex;
+  gap: 8px;
+  max-width: 220px;
+}
+.portrait-actions .ghost-btn {
+  flex: 1;
+  font-size: 12px;
+  padding: 6px 8px;
+}
+.portrait-input {
+  display: none;
+}
+.record-id-portrait {
+  grid-template-columns: 220px 1fr 1fr;
+}
+.record-portrait-cell {
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 680px) {
+  .record-id-portrait {
+    grid-template-columns: 1fr;
+  }
+  .record-portrait-cell {
+    grid-row: auto;
+  }
   .field-grid,
   .record-id,
   .record-drives,

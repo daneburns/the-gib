@@ -27,6 +27,7 @@ export function newCharacter(): Character {
     borneBy: '',
     bearing: '',
     origin: '',
+    portrait: '',
     qualities: emptyQualities(),
     wants: '',
     fears: '',

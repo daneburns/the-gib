@@ -12,6 +12,7 @@ import {
   genInventory,
 } from '../generator'
 import QualityAllocator, { formatMod } from './QualityAllocator'
+import Portrait from './Portrait'
 
 interface Props {
   initial: Character
@@ -118,6 +119,16 @@ export default function Creator({ initial, onSave, onCancel }: Props) {
         <div className="section-body">
           {step === 1 && (
             <div className="field-grid">
+              <label className="field wide id-portrait-field">
+                <span className="field-label">
+                  <span>Likeness — affix a photograph, if one exists</span>
+                </span>
+                <Portrait
+                  value={draft.portrait}
+                  onChange={(v) => set('portrait', v)}
+                  caption="A likeness may be affixed later"
+                />
+              </label>
               <Field
                 label="Designation — the name they answer to"
                 value={draft.designation}
